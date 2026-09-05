@@ -1,0 +1,1118 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F4F9F8;
+    --surface: #FFFFFF;
+    --ink: #10262B;
+    --ink-soft: #587377;
+    --ink-faint: #93A9AC;
+    --teal: #0E7C86;
+    --teal-deep: #0A5C64;
+    --aqua: #3FA7B3;
+    --good: #2E9E5B;
+    --good-bg: #E7F5ED;
+    --bad: #D6503D;
+    --bad-bg: #FBEAE7;
+    --border: #DCE7E6;
+    --radius-s: 3px;
+    --radius-m: 8px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #90D5FF 0%, #003759 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app-shell {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  .content-panel {
+    background: var(--surface);
+    border-radius: var(--radius-m);
+    padding: 32px 28px 36px;
+    box-shadow: 0 10px 34px rgba(4, 30, 40, 0.16);
+  }
+
+  /* ---------- Header ---------- */
+  .pool-header {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-m);
+    margin-bottom: 10px;
+    isolation: isolate;
+  }
+
+  /* painted pool water: caustic light pools + refraction streaks over a tile-blue gradient */
+  .pool-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: #5E7380;
+  }
+
+  /* scrim: darkens the water so white text and buttons stay legible anywhere on the header */
+  .pool-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(175deg, rgba(5,28,35,0.55) 0%, rgba(5,28,35,0.22) 45%, rgba(5,28,35,0.5) 100%);
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 22px 28px;
+  }
+
+  .header-content h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    margin: 0 0 6px;
+    color: #fff;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 10px rgba(4,20,26,0.4);
+  }
+
+  .header-content .subtitle {
+    color: rgba(255,255,255,0.92);
+    font-size: 14px;
+    margin: 0;
+    text-shadow: 0 1px 6px rgba(4,20,26,0.35);
+  }
+
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .pool-header .btn-primary {
+    background: #fff;
+    color: var(--teal-deep);
+  }
+  .pool-header .btn-primary:hover { background: #EAF7FB; }
+
+  .pool-header .btn-ghost {
+    background: #fff;
+    color: var(--teal-deep);
+    border: 1px solid #fff;
+  }
+  .pool-header .btn-ghost:hover { background: #EAF7FB; }
+
+  button {
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: #fff;
+    padding: 11px 18px;
+    border-radius: var(--radius-s);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+  .btn-primary:hover { background: var(--teal-deep); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--teal-deep);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: var(--radius-s);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .btn-ghost:hover { border-color: var(--teal); }
+
+  /* ---------- Dashboard tiles ---------- */
+  .section-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .as-of {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  .tile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 44px;
+  }
+
+  .tile-grid .param-tile {
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .tile-grid .param-tile:hover {
+    box-shadow: 0 10px 26px rgba(16, 38, 43, 0.13);
+    transform: translateY(-2px);
+  }
+
+  .param-tile {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    height: 176px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(16, 38, 43, 0.05);
+  }
+
+  .param-tile .tile-badge {
+    flex: 0 0 auto;
+    padding: 9px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--bg);
+    color: var(--ink-faint);
+  }
+  .param-tile[data-status="good"] .tile-badge { background: var(--good-bg); color: var(--good); }
+  .param-tile[data-status="bad"] .tile-badge { background: var(--bad-bg); color: var(--bad); }
+
+  .param-tile .tile-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 22px 26px 24px;
+  }
+
+  .param-tile .tile-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .param-tile .tile-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .param-tile .tile-value .unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-faint);
+    margin-left: 3px;
+  }
+
+  .param-tile .tile-value.empty {
+    color: var(--ink-faint);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .param-tile .tile-range {
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-top: 9px;
+  }
+
+  /* ---------- History table ---------- */
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .history-table thead th {
+    text-align: left;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    padding: 0 10px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .history-table thead th.num { text-align: center; }
+
+  .history-table tbody tr {
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s ease;
+  }
+  .history-table tbody tr:hover { background: #EEF6F5; }
+
+  .history-table td {
+    padding: 12px 10px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .history-table td.date-cell {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .time-tag {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+  }
+  .dot.good { background: var(--good); }
+  .dot.bad { background: var(--bad); }
+
+  .history-table td.num { text-align: center; color: var(--ink-soft); font-size: 13.5px; }
+
+  .empty-state {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-m);
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  /* ---------- Modal ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 38, 43, 0.42);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px;
+    overflow-y: auto;
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--surface);
+    width: 100%;
+    max-width: 480px;
+    border-radius: var(--radius-m);
+    padding: 28px;
+    box-shadow: 0 12px 40px rgba(16, 38, 43, 0.2);
+  }
+
+  .chart-modal { max-width: 600px; }
+
+  .chart-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 18px;
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .chart-legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .chart-empty {
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    padding: 48px 10px;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .modal-close {
+    background: transparent;
+    color: var(--ink-faint);
+    font-size: 20px;
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--ink); }
+
+  .field-row {
+    margin-bottom: 14px;
+  }
+
+  .field-row label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+
+  .field-row input {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .field-row input:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px;
+  }
+
+  .range-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 22px;
+  }
+
+  .modal-actions .right { display: flex; gap: 8px; }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--bad);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 4px;
+  }
+  .btn-danger:hover { text-decoration: underline; }
+
+  .detail-tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .loading-note {
+    color: var(--ink-faint);
+    font-size: 14px;
+    padding: 20px 0;
+  }
+
+  .io-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .btn-io {
+    background: #fff;
+    color: var(--teal-deep);
+    border: 1px solid var(--border);
+    padding: 9px 22px;
+    border-radius: var(--radius-s);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .btn-io:hover { border-color: var(--teal); }
+
+  @media (max-width: 700px) {
+    .tile-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 480px) {
+    .header-content { flex-direction: column; align-items: flex-start; }
+    .field-grid { grid-template-columns: 1fr; }
+    .tile-grid { grid-template-columns: 1fr; }
+    .param-tile { height: auto; min-height: 132px; }
+  }
+</style>
+
+<div class="app-shell">
+  <header class="pool-header">
+    <div class="header-content">
+      <div>
+        <h1>Pool Log</h1>
+        <p class="subtitle" id="subtitle">Loading your readings…</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost" id="openRangesBtn">Target ranges</button>
+        <button class="btn-primary" id="openAddBtn">Log a test</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-panel">
+    <div class="section-heading">
+      Current Readings
+      <span class="as-of" id="asOf"></span>
+    </div>
+    <div class="tile-grid" id="tileGrid"></div>
+
+    <div class="section-heading">Test History</div>
+    <div id="historyWrap"><p class="loading-note">Loading…</p></div>
+  </div>
+
+  <div class="io-row">
+    <button class="btn-io" id="exportBtn">Export</button>
+    <button class="btn-io" id="importBtn">Import</button>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+</div>
+
+<!-- Add test modal -->
+<div class="overlay hidden" id="addOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Log a test</h2>
+      <button class="modal-close" data-close="addOverlay">&times;</button>
+    </div>
+    <div id="addForm">
+      <div class="field-row">
+        <label for="f-date">Date</label>
+        <input type="date" id="f-date" required>
+      </div>
+      <div class="field-grid" id="addFields"></div>
+      <div class="modal-actions">
+        <span></span>
+        <div class="right">
+          <button type="button" class="btn-ghost" data-close="addOverlay">Cancel</button>
+          <button type="button" class="btn-primary" id="addSaveBtn">Save test</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="overlay hidden" id="detailOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="detailTitle">Test detail</h2>
+      <button class="modal-close" data-close="detailOverlay">&times;</button>
+    </div>
+    <div class="detail-tile-grid" id="detailGrid"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-danger" id="deleteTestBtn">Delete this test</button>
+      <div class="right">
+        <button type="button" class="btn-ghost" data-close="detailOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ranges modal -->
+<div class="overlay hidden" id="rangesOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Target ranges</h2>
+      <button class="modal-close" data-close="rangesOverlay">&times;</button>
+    </div>
+    <div id="rangesForm">
+      <div id="rangesFields"></div>
+      <div class="modal-actions">
+        <span></span>
+        <div class="right">
+          <button type="button" class="btn-ghost" data-close="rangesOverlay">Cancel</button>
+          <button type="button" class="btn-primary" id="rangesSaveBtn">Save ranges</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart modal -->
+<div class="overlay hidden" id="chartOverlay">
+  <div class="modal chart-modal">
+    <div class="modal-header">
+      <h2 id="chartTitle">History</h2>
+      <button class="modal-close" data-close="chartOverlay">&times;</button>
+    </div>
+    <div id="chartContainer"></div>
+    <div class="modal-actions">
+      <span></span>
+      <div class="right">
+        <button type="button" class="btn-ghost" data-close="chartOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const PARAM_ORDER = ['FC', 'CC', 'pH', 'TA', 'CYA', 'TH'];
+  const PARAM_META = {
+    FC:  { label: 'Free chlorine',     abbr: 'FC',  unit: 'ppm', step: 0.1 },
+    CC:  { label: 'Combined chlorine', abbr: 'CC',  unit: 'ppm', step: 0.1 },
+    pH:  { label: 'pH',                abbr: '',    unit: '',    step: 0.1 },
+    TA:  { label: 'Alkalinity',        abbr: 'TA',  unit: 'ppm', step: 1 },
+    CYA: { label: 'Cyanuric acid',     abbr: 'CYA', unit: 'ppm', step: 1 },
+    TH:  { label: 'Calcium hardness',  abbr: 'CH',  unit: 'ppm', step: 1 },
+  };
+
+  function defaultRanges() {
+    return {
+      FC:  { min: 2,   max: 4   },
+      CC:  { min: 0,   max: 0.5 },
+      pH:  { min: 7.2, max: 7.8 },
+      TA:  { min: 80,  max: 120 },
+      CYA: { min: 30,  max: 50  },
+      TH:  { min: 200, max: 400 },
+    };
+  }
+
+  let state = { tests: [], ranges: defaultRanges() };
+
+  // ---------- storage ----------
+  // Three tiers, tried in order:
+  // 1. Claude's artifact storage, when this file is running inside a claude.ai artifact.
+  // 2. A Cloudflare Pages Function + KV API (/api/pool-tests, /api/pool-ranges), when
+  //    this file is deployed standalone on Cloudflare Pages with that backend set up.
+  //    Requires a passcode, entered once and cached in localStorage on that browser.
+  // 3. localStorage — the final fallback, so the page still works with no backend at all
+  //    (e.g. opened as a local file), just without cross-device sync.
+  const hasArtifactStorage = typeof window.storage !== 'undefined'
+    && window.storage
+    && typeof window.storage.get === 'function';
+
+  let apiKey = null;
+  try { apiKey = localStorage.getItem('pool-api-key'); } catch (e) { apiKey = null; }
+
+  // Once a plain fetch to /api/... fails outright (no such route — not running on
+  // Cloudflare Pages), stop retrying it for the rest of the session.
+  let remoteApiUnavailable = false;
+
+  async function remoteRequest(key, method, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['X-Pool-Key'] = apiKey;
+    const opts = { method, headers };
+    if (body !== undefined) opts.body = body;
+
+    let res;
+    try {
+      res = await fetch(`/api/${key}`, opts);
+    } catch (e) {
+      remoteApiUnavailable = true;
+      throw e;
+    }
+
+    if (res.status === 401) {
+      const entered = window.prompt('Enter your Pool Log passcode to sync data across devices:');
+      if (!entered) throw new Error('No passcode entered');
+      apiKey = entered;
+      try { localStorage.setItem('pool-api-key', entered); } catch (e) {}
+      headers['X-Pool-Key'] = apiKey;
+      res = await fetch(`/api/${key}`, { ...opts, headers });
+    }
+
+    if (res.status === 404) {
+      remoteApiUnavailable = true;
+      throw new Error('No remote API on this deployment');
+    }
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+    return res;
+  }
+
+  async function storageGet(key) {
+    if (hasArtifactStorage) {
+      try {
+        const r = await window.storage.get(key, false);
+        return r ? r.value : null;
+      } catch (e) { return null; }
+    }
+    if (!remoteApiUnavailable) {
+      try {
+        const res = await remoteRequest(key, 'GET');
+        const data = await res.json();
+        if (data && typeof data.value === 'string') {
+          try { localStorage.setItem(key, data.value); } catch (e) {}
+        }
+        return data ? data.value : null;
+      } catch (e) {
+        // fall through to localStorage
+      }
+    }
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  async function storageSet(key, value) {
+    if (hasArtifactStorage) {
+      try { await window.storage.set(key, value, false); return true; } catch (e) { return false; }
+    }
+    let remoteOk = true;
+    if (!remoteApiUnavailable) {
+      try {
+        await remoteRequest(key, 'POST', JSON.stringify({ value }));
+      } catch (e) {
+        remoteOk = false;
+      }
+    }
+    try { localStorage.setItem(key, value); } catch (e) { return remoteOk; }
+    return true;
+  }
+
+  async function loadData() {
+    try {
+      const raw = await storageGet('pool-tests');
+      state.tests = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      state.tests = [];
+    }
+    try {
+      const raw = await storageGet('pool-ranges');
+      state.ranges = raw ? JSON.parse(raw) : defaultRanges();
+    } catch (e) {
+      state.ranges = defaultRanges();
+    }
+  }
+
+  async function saveTests() {
+    const ok = await storageSet('pool-tests', JSON.stringify(state.tests));
+    if (!ok) console.error('Could not save tests');
+  }
+
+  async function saveRanges() {
+    const ok = await storageSet('pool-ranges', JSON.stringify(state.ranges));
+    if (!ok) console.error('Could not save ranges');
+  }
+
+  // ---------- helpers ----------
+  function statusFor(key, value) {
+    if (value === null || value === undefined || value === '') return 'none';
+    const r = state.ranges[key];
+    return (value >= r.min && value <= r.max) ? 'good' : 'bad';
+  }
+
+  function fmtDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fmtTimeET(isoTimestamp) {
+    if (!isoTimestamp) return null;
+    const d = new Date(isoTimestamp);
+    if (isNaN(d.getTime())) return null;
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(d);
+  }
+
+  function sortedTests() {
+    return [...state.tests].sort((a, b) => {
+      if (a.date !== b.date) return b.date.localeCompare(a.date);
+      const at = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (at !== bt) return bt - at;
+      // fallback for entries with no createdAt (e.g. imported data): the id
+      // embeds a creation timestamp, so it still gives a stable, sensible order
+      const aid = parseInt(String(a.id || '').replace(/\D/g, ''), 10) || 0;
+      const bid = parseInt(String(b.id || '').replace(/\D/g, ''), 10) || 0;
+      return bid - aid;
+    });
+  }
+
+  // latest test (by date) that has a non-empty value for this param
+  function latestFor(key) {
+    const sorted = sortedTests();
+    for (const t of sorted) {
+      if (t[key] !== null && t[key] !== undefined && t[key] !== '') {
+        return { value: t[key], date: t.date };
+      }
+    }
+    return null;
+  }
+
+  // ---------- render: dashboard ----------
+  function renderTileGrid() {
+    const grid = document.getElementById('tileGrid');
+    grid.innerHTML = '';
+    let mostRecentDate = null;
+
+    PARAM_ORDER.forEach((key) => {
+      const meta = PARAM_META[key];
+      const range = state.ranges[key];
+      const latest = latestFor(key);
+      const tile = document.createElement('div');
+      tile.className = 'param-tile';
+
+      if (latest) {
+        const status = statusFor(key, latest.value);
+        tile.dataset.status = status;
+        if (!mostRecentDate || latest.date > mostRecentDate) mostRecentDate = latest.date;
+        tile.innerHTML = `
+          <div class="tile-badge">${status === 'good' ? 'In range' : 'Out of range'}</div>
+          <div class="tile-body">
+            <div class="tile-label">${meta.label}${meta.abbr ? ' (' + meta.abbr + ')' : ''}</div>
+            <div class="tile-value">${latest.value}${meta.unit ? ` <span class="unit">${meta.unit}</span>` : ''}</div>
+            <div class="tile-range">Target ${range.min}&ndash;${range.max}${meta.unit ? ' ' + meta.unit : ''}</div>
+          </div>
+        `;
+      } else {
+        tile.innerHTML = `
+          <div class="tile-badge">No data</div>
+          <div class="tile-body">
+            <div class="tile-label">${meta.label}${meta.abbr ? ' (' + meta.abbr + ')' : ''}</div>
+            <div class="tile-value empty">No reading yet</div>
+            <div class="tile-range">Target ${range.min}&ndash;${range.max}${meta.unit ? ' ' + meta.unit : ''}</div>
+          </div>
+        `;
+      }
+      tile.addEventListener('click', () => openChart(key));
+      grid.appendChild(tile);
+    });
+
+    const asOf = document.getElementById('asOf');
+    asOf.textContent = mostRecentDate ? `as of ${fmtDate(mostRecentDate)}` : '';
+  }
+
+  // ---------- render: history ----------
+  function renderHistory() {
+    const wrap = document.getElementById('historyWrap');
+    const tests = sortedTests();
+
+    if (tests.length === 0) {
+      wrap.innerHTML = `<div class="empty-state">No tests logged yet. Log your first reading to start tracking your water.</div>`;
+      return;
+    }
+
+    const rows = tests.map((t) => {
+      const dots = PARAM_ORDER.map((key) => {
+        const s = statusFor(key, t[key]);
+        return `<span class="dot ${s === 'none' ? '' : s}" title="${key}"></span>`;
+      }).join(' ');
+      const time = fmtTimeET(t.createdAt);
+      return `
+        <tr data-id="${t.id}">
+          <td class="date-cell">${fmtDate(t.date)}${time ? ` <span class="time-tag">${time} ET</span>` : ''}</td>
+          <td class="num">${dots}</td>
+        </tr>
+      `;
+    }).join('');
+
+    wrap.innerHTML = `
+      <table class="history-table">
+        <thead>
+          <tr><th>Date</th><th class="num">Readings</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+
+    wrap.querySelectorAll('tbody tr').forEach((row) => {
+      row.addEventListener('click', () => openDetail(row.dataset.id));
+    });
+  }
+
+  function renderAll() {
+    renderTileGrid();
+    renderHistory();
+  }
+
+  // ---------- add test modal ----------
+  function buildAddFields() {
+    const container = document.getElementById('addFields');
+    container.innerHTML = PARAM_ORDER.map((key) => {
+      const meta = PARAM_META[key];
+      return `
+        <div class="field-row">
+          <label for="f-${key}">${meta.label}${meta.unit ? ' (' + meta.unit + ')' : ''}</label>
+          <input type="number" step="${meta.step}" id="f-${key}" placeholder="${state.ranges[key].min}&ndash;${state.ranges[key].max}">
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openAdd() {
+    const today = new Date();
+    document.getElementById('f-date').value = today.toISOString().slice(0, 10);
+    PARAM_ORDER.forEach((key) => {
+      document.getElementById(`f-${key}`).value = '';
+    });
+    show('addOverlay');
+  }
+
+  document.getElementById('addSaveBtn').addEventListener('click', async () => {
+    const date = document.getElementById('f-date').value;
+    if (!date) return;
+    const entry = { id: 't' + Date.now(), date, createdAt: new Date().toISOString() };
+    PARAM_ORDER.forEach((key) => {
+      const raw = document.getElementById(`f-${key}`).value;
+      entry[key] = raw === '' ? null : parseFloat(raw);
+    });
+    state.tests.push(entry);
+    await saveTests();
+    renderAll();
+    hide('addOverlay');
+  });
+
+  // ---------- detail modal ----------
+  function openDetail(id) {
+    const t = state.tests.find((x) => x.id === id);
+    if (!t) return;
+    document.getElementById('detailTitle').textContent = fmtDate(t.date);
+    const grid = document.getElementById('detailGrid');
+    grid.innerHTML = PARAM_ORDER.map((key) => {
+      const meta = PARAM_META[key];
+      const range = state.ranges[key];
+      const value = t[key];
+      const status = statusFor(key, value);
+      const tile = document.createElement('div');
+      tile.className = 'param-tile';
+      if (status !== 'none') tile.dataset.status = status;
+      const valueHtml = (value === null || value === undefined)
+        ? `<div class="tile-value empty">Not tested</div>`
+        : `<div class="tile-value">${value}${meta.unit ? ` <span class="unit">${meta.unit}</span>` : ''}</div>`;
+      const badgeText = status === 'good' ? 'In range' : status === 'bad' ? 'Out of range' : 'Not tested';
+      tile.innerHTML = `
+        <div class="tile-badge">${badgeText}</div>
+        <div class="tile-body">
+          <div class="tile-label">${meta.label}${meta.abbr ? ' (' + meta.abbr + ')' : ''}</div>
+          ${valueHtml}
+          <div class="tile-range">Target ${range.min}&ndash;${range.max}${meta.unit ? ' ' + meta.unit : ''}</div>
+        </div>
+      `;
+      return tile.outerHTML;
+    }).join('');
+    document.getElementById('deleteTestBtn').dataset.id = t.id;
+    show('detailOverlay');
+  }
+
+  // ---------- chart ----------
+  function buildChartSVG(key) {
+    const meta = PARAM_META[key];
+    const range = state.ranges[key];
+    const points = state.tests
+      .filter((t) => t[key] !== null && t[key] !== undefined && t[key] !== '')
+      .map((t) => ({ date: t.date, value: t[key], ts: new Date(t.date).getTime() }))
+      .sort((a, b) => a.ts - b.ts);
+
+    if (points.length === 0) {
+      return `<div class="chart-empty">No ${meta.label.toLowerCase()} readings logged yet.</div>`;
+    }
+
+    const W = 560, H = 280;
+    const padL = 46, padR = 18, padT = 20, padB = 34;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+
+    const values = points.map((p) => p.value);
+    let yMin = Math.min(range.min, ...values);
+    let yMax = Math.max(range.max, ...values);
+    if (yMin === yMax) { yMin -= 1; yMax += 1; }
+    const yPad = (yMax - yMin) * 0.12;
+    yMin -= yPad;
+    yMax += yPad;
+
+    const tsMin = points[0].ts;
+    const tsMax = points[points.length - 1].ts;
+    const tsSpan = tsMax - tsMin || 1;
+
+    const xScale = (ts) => points.length === 1
+      ? padL + plotW / 2
+      : padL + ((ts - tsMin) / tsSpan) * plotW;
+    const yScale = (v) => padT + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+
+    const bandTop = yScale(range.max);
+    const bandBottom = yScale(range.min);
+
+    const linePoints = points.map((p) => `${xScale(p.ts)},${yScale(p.value)}`).join(' ');
+
+    const dots = points.map((p) => {
+      const status = statusFor(key, p.value);
+      const color = status === 'good' ? 'var(--good)' : 'var(--bad)';
+      return `<circle cx="${xScale(p.ts)}" cy="${yScale(p.value)}" r="4.5" fill="${color}" stroke="#fff" stroke-width="1.5"><title>${fmtDate(p.date)}: ${p.value}${meta.unit ? ' ' + meta.unit : ''}</title></circle>`;
+    }).join('');
+
+    const firstLabel = fmtDate(points[0].date);
+    const lastLabel = points.length > 1 ? fmtDate(points[points.length - 1].date) : '';
+
+    return `
+      <svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+        <rect x="${padL}" y="${bandTop}" width="${plotW}" height="${Math.max(bandBottom - bandTop, 0)}" fill="var(--good-bg)" />
+        <line x1="${padL}" y1="${yScale(range.max)}" x2="${W - padR}" y2="${yScale(range.max)}" stroke="var(--good)" stroke-width="1" stroke-dasharray="4 3" opacity="0.6" />
+        <line x1="${padL}" y1="${yScale(range.min)}" x2="${W - padR}" y2="${yScale(range.min)}" stroke="var(--good)" stroke-width="1" stroke-dasharray="4 3" opacity="0.6" />
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="var(--border)" stroke-width="1" />
+        <polyline points="${linePoints}" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+        ${dots}
+        <text x="${padL}" y="${H - 8}" font-size="11" fill="var(--ink-faint)" font-family="Inter, sans-serif">${firstLabel}</text>
+        <text x="${W - padR}" y="${H - 8}" font-size="11" fill="var(--ink-faint)" font-family="Inter, sans-serif" text-anchor="end">${lastLabel}</text>
+        <text x="${padL - 8}" y="${yScale(range.max) + 4}" font-size="10.5" fill="var(--ink-faint)" font-family="Inter, sans-serif" text-anchor="end">${range.max}</text>
+        <text x="${padL - 8}" y="${yScale(range.min) + 4}" font-size="10.5" fill="var(--ink-faint)" font-family="Inter, sans-serif" text-anchor="end">${range.min}</text>
+      </svg>
+      <div class="chart-legend">
+        <span><span class="dot" style="background:var(--good)"></span>In range</span>
+        <span><span class="dot" style="background:var(--bad)"></span>Out of range</span>
+        <span>${points.length} reading${points.length === 1 ? '' : 's'}</span>
+      </div>
+    `;
+  }
+
+  function openChart(key) {
+    const meta = PARAM_META[key];
+    document.getElementById('chartTitle').textContent = `${meta.label} history`;
+    document.getElementById('chartContainer').innerHTML = buildChartSVG(key);
+    show('chartOverlay');
+  }
+
+  document.getElementById('deleteTestBtn').addEventListener('click', async (e) => {
+    const id = e.target.dataset.id;
+    state.tests = state.tests.filter((t) => t.id !== id);
+    await saveTests();
+    renderAll();
+    hide('detailOverlay');
+  });
+
+  // ---------- ranges modal ----------
+  function buildRangesFields() {
+    const container = document.getElementById('rangesFields');
+    container.innerHTML = PARAM_ORDER.map((key) => {
+      const meta = PARAM_META[key];
+      const r = state.ranges[key];
+      return `
+        <div class="field-row">
+          <label>${meta.label}${meta.unit ? ' (' + meta.unit + ')' : ''}</label>
+          <div class="range-pair">
+            <input type="number" step="${meta.step}" id="r-min-${key}" value="${r.min}" placeholder="Min">
+            <input type="number" step="${meta.step}" id="r-max-${key}" value="${r.max}" placeholder="Max">
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('rangesSaveBtn').addEventListener('click', async () => {
+    PARAM_ORDER.forEach((key) => {
+      const min = parseFloat(document.getElementById(`r-min-${key}`).value);
+      const max = parseFloat(document.getElementById(`r-max-${key}`).value);
+      if (!isNaN(min) && !isNaN(max)) state.ranges[key] = { min, max };
+    });
+    await saveRanges();
+    renderAll();
+    hide('rangesOverlay');
+  });
+
+  // ---------- modal plumbing ----------
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+  document.querySelectorAll('[data-close]').forEach((btn) => {
+    btn.addEventListener('click', () => hide(btn.dataset.close));
+  });
+  document.querySelectorAll('.overlay').forEach((ov) => {
+    ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.add('hidden'); });
+  });
+
+  document.getElementById('openAddBtn').addEventListener('click', openAdd);
+  document.getElementById('openRangesBtn').addEventListener('click', () => {
+    buildRangesFields();
+    show('rangesOverlay');
+  });
+
+  // ---------- export / import ----------
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      tests: state.tests,
+      ranges: state.ranges,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pool-log-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (Array.isArray(data.tests)) state.tests = data.tests;
+      if (data.ranges) state.ranges = data.ranges;
+      await saveTests();
+      await saveRanges();
+      renderAll();
+    } catch (err) {
+      console.error('Could not import file', err);
+      alert("That file doesn't look like a valid pool log export.");
+    }
+    e.target.value = '';
+  });
+
+  // ---------- boot ----------
+  (async function init() {
+    await loadData();
+    buildAddFields();
+    document.getElementById('subtitle').textContent = 'Track chlorine, pH, and balance readings over time.';
+    renderAll();
+  })();
+})();
+</script>
