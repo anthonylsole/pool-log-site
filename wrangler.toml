@@ -1,4 +1,4 @@
-name = "pool-log"
+name = "poollog"
 compatibility_date = "2024-09-01"
 pages_build_output_dir = "."
 
@@ -9,4 +9,4 @@ pages_build_output_dir = "."
 # -> KV namespace bindings) for the deployed site, not just local dev.
 [[kv_namespaces]]
 binding = "POOL_KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "pool-log"
